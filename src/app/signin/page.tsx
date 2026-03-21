@@ -65,12 +65,12 @@ export default function SignInPage() {
           </div>
 
           <button
-            type="submit"
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity"
-          >
-            Continue with Google 🚀
-          </button>
-
+  type="button"
+  onClick={() => signIn("google")}
+  className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity"
+>
+  Continue with Google 🚀
+</button>
           <p className="text-center text-xs text-zinc-500">
             Login via Google authentication.{" "}
             <Link
