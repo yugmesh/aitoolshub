@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { SessionProvider } from "next-auth/react";
+import SessionWrapper from "@/components/SessionWrapper";
 
 export const metadata: Metadata = {
   title: {
@@ -14,20 +14,16 @@ export const metadata: Metadata = {
     "Browse, compare, and find the perfect AI tools for your workflow. Expert-reviewed, updated daily.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className="bg-[#070709] text-zinc-100 antialiased min-h-screen flex flex-col">
         
-        <SessionProvider>
+        <SessionWrapper>
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />
-        </SessionProvider>
+        </SessionWrapper>
 
       </body>
     </html>
