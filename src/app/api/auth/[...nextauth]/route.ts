@@ -1,9 +1,10 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import clientPromise from "@/lib/mongodb"; 
+import clientPromise from "@/lib/mongodb";
+
 const handler = NextAuth({
-  adapter: MongoDBAdapter(clientPromise), // 🔥 YE ADD KARNA HAI
+  adapter: MongoDBAdapter(clientPromise),
 
   providers: [
     GoogleProvider({
@@ -11,6 +12,13 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
+
+  callbacks: {
+    async signIn({ user }) {
+      console.log("USER LOGIN:", user); // 🔥 console check
+      return true;
+    },
+  },
 
   secret: process.env.NEXTAUTH_SECRET,
 });

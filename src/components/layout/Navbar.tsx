@@ -1,16 +1,20 @@
 "use client";
+
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Zap, Menu, X, Bookmark, Search } from "lucide-react";
 import { useBookmarks } from "@/hooks/useBookmarks";
+import { signIn, signOut, useSession } from "next-auth/react";
+
 
 const NAV_LINKS = [
-  { label: "Browse",     href: "/tools" },
-  { label: "Compare",    href: "/compare" },
+  { label: "Browse", href: "/tools" },
+  { label: "Compare", href: "/compare" },
   { label: "Categories", href: "/tools" },
-  { label: "Pricing",    href: "/#pricing" },
-  { label: "Blog",       href: "/blog" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "Blog", href: "/blog" },
 ];
 
 export default function Navbar() {
@@ -19,6 +23,8 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchVal, setSearchVal] = useState("");
   const { bookmarks } = useBookmarks();
+
+  const { data: session } = useSession();
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -60,7 +66,8 @@ export default function Navbar() {
 
         {/* Right actions */}
         <div className="hidden md:flex items-center gap-2">
-          {/* Quick search */}
+
+          {/* Search */}
           <form onSubmit={handleSearch} className="flex items-center gap-1 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-1.5">
             <Search className="w-3.5 h-3.5 text-zinc-500" />
             <input
@@ -70,6 +77,8 @@ export default function Navbar() {
               className="bg-transparent outline-none text-xs text-zinc-300 placeholder-zinc-600 w-32"
             />
           </form>
+
+          {/* Bookmarks */}
           <Link
             href="/bookmarks"
             className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-all"
@@ -81,9 +90,42 @@ export default function Navbar() {
               </span>
             )}
           </Link>
-          <Link href="/signin" className="px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white transition-colors">
-            Sign In
-          </Link>
+         {/* 🔥 AUTH SECTION */}
+{!session ? (
+  <button
+    onClick={() => signIn("google")}
+    className="px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+  >
+    Sign In
+  </button>
+) : (
+  <div className="flex items-center gap-2">
+
+    {session.user?.image ? (
+      <Image
+        src={session.user.image}
+        alt="profile"
+        width={32}
+        height={32}
+        className="rounded-full"
+      />
+    ) : (
+      <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-xs text-white">
+        {session.user?.name?.charAt(0)}
+      </div>
+    )}
+
+    <button
+      onClick={() => signOut()}
+      className="px-3 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white"
+    >
+      Logout
+    </button>
+  </div>
+)}
+          
+             
+          {/* Get Started */}
           <Link
             href="/tools"
             className="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:opacity-90 transition-opacity"
@@ -104,6 +146,7 @@ export default function Navbar() {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden bg-[#0a0a12] border-t border-white/[0.06] px-4 py-4 flex flex-col gap-1">
+
           <form onSubmit={handleSearch} className="flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] rounded-xl px-4 py-2.5 mb-2">
             <Search className="w-4 h-4 text-zinc-500" />
             <input
@@ -113,6 +156,7 @@ export default function Navbar() {
               className="flex-1 bg-transparent outline-none text-sm text-zinc-300 placeholder-zinc-600"
             />
           </form>
+
           {NAV_LINKS.map((link) => (
             <Link
               key={link.label}
@@ -123,16 +167,43 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+
           <div className="border-t border-white/[0.06] pt-3 mt-2 flex flex-col gap-2">
-            <Link href="/bookmarks" onClick={() => setMobileOpen(false)} className="px-4 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white flex items-center gap-2">
-              <Bookmark className="w-4 h-4" /> Bookmarks {bookmarks.length > 0 && `(${bookmarks.length})`}
+
+            <Link
+              href="/bookmarks"
+              onClick={() => setMobileOpen(false)}
+              className="px-4 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white flex items-center gap-2"
+            >
+              <Bookmark className="w-4 h-4" />
+              Bookmarks {bookmarks.length > 0 && `(${bookmarks.length})`}
             </Link>
-            <Link href="/signin" onClick={() => setMobileOpen(false)} className="px-4 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white">
-              Sign In
-            </Link>
-            <Link href="/tools" onClick={() => setMobileOpen(false)} className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-center">
+
+            {/* 🔥 MOBILE AUTH */}
+            {!session ? (
+              <button
+                onClick={() => signIn("google")}
+                className="px-4 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-white"
+              >
+                Sign In
+              </button>
+            ) : (
+              <button
+                onClick={() => signOut()}
+                className="px-4 py-2.5 rounded-lg text-sm text-white"
+              >
+                Logout
+              </button>
+            )}
+
+            <Link
+              href="/tools"
+              onClick={() => setMobileOpen(false)}
+              className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-center"
+            >
               Get Started
             </Link>
+
           </div>
         </div>
       )}
